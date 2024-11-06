@@ -20,7 +20,10 @@ class KeyboardTrainer:
         pygame.mixer.init()  # Инициализация звука
         self.WIDTH = 1200
         self.HEIGHT = 900
-        self.window = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        # self.window = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.fullscreen = False  # Добавьте флаг для отслеживания состояния полноэкранного режима
+        self.window = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)  # Начальный режим окна
+
         pygame.display.set_caption("Клавиатурный тренажёр")
 
         # Цвета
@@ -285,6 +288,13 @@ class KeyboardTrainer:
                             self.game_state = GameState.SETTINGS
                         elif event.key == pygame.K_t:
                             self.game_state = GameState.STATISTICS
+                        elif event.key == pygame.K_F11:  # F11 для переключения полноэкранного режима
+                            self.fullscreen = not self.fullscreen
+                            if self.fullscreen:
+                                self.window = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.FULLSCREEN)
+                            else:
+                                self.window = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)
+
                         elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
                             difficulties = list(self.difficulty_levels.keys())
                             current_index = difficulties.index(self.current_difficulty)
