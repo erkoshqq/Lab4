@@ -6,6 +6,7 @@ import json
 from enum import Enum
 from datetime import datetime
 
+
 class GameState(Enum):
     MENU = 1
     PLAYING = 2
@@ -14,13 +15,15 @@ class GameState(Enum):
     SETTINGS = 5
     STATISTICS = 6
 
+
 class KeyboardTrainer:
     def __init__(self):
         pygame.init()
         pygame.mixer.init()  # Инициализация звука
         self.WIDTH = 1200
         self.HEIGHT = 900
-        self.window = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.window = pygame.display.set_mode(
+            (self.WIDTH, self.HEIGHT), pygame.RESIZABLE)  # Начальный режим окна
         pygame.display.set_caption("Клавиатурный тренажёр")
 
         # Цвета
@@ -43,7 +46,7 @@ class KeyboardTrainer:
             "Сложный": {"speed": 5, "spawn_rate": 1.5, "letters": string.ascii_uppercase + string.digits}
         }
         self.current_difficulty = "Средний"
-        
+
         # Настройки игры
         self.settings = {
             "sound_enabled": True,
@@ -51,22 +54,22 @@ class KeyboardTrainer:
             "dark_mode": True,
             "letter_effects": True
         }
-        
+
         # Статистика
         self.stats = self.load_statistics()
         self.session_start_time = None
-        
+
         # Игровое состояние
         self.game_state = GameState.MENU
         self.particles = []
-        
+
         # Загрузка звуков
         self.sounds = {
             "correct": pygame.mixer.Sound("sounds/correct.mp3") if pygame.mixer.get_init() else None,
             "wrong": pygame.mixer.Sound("sounds/incorrect.mp3") if pygame.mixer.get_init() else None,
             "level_up": pygame.mixer.Sound("sounds/new_level.mp3") if pygame.mixer.get_init() else None
         }
-        
+
         # Инициализация игровых параметров
         self.reset_game()
 
@@ -144,15 +147,18 @@ class KeyboardTrainer:
     def draw_menu(self):
         background_color = self.BLACK if self.settings["dark_mode"] else self.WHITE
         text_color = self.WHITE if self.settings["dark_mode"] else self.BLACK
-        
+
         self.window.fill(background_color)
-        
+
         title = self.main_font.render("Клавиатурный тренажёр", True, self.BLUE)
-        start_text = self.menu_font.render("ПРОБЕЛ - Начать игру", True, text_color)
-        settings_text = self.menu_font.render("S - Настройки", True, text_color)
+        start_text = self.menu_font.render(
+            "ПРОБЕЛ - Начать игру", True, text_color)
+        settings_text = self.menu_font.render(
+            "S - Настройки", True, text_color)
         stats_text = self.menu_font.render("T - Статистика", True, text_color)
-        difficulty_text = self.menu_font.render(f"Сложность: {self.current_difficulty} (←→)", True, text_color)
-        
+        difficulty_text = self.menu_font.render(
+            f"Сложность: {self.current_difficulty} (←→)", True, text_color)
+
         texts = [
             (title, 100),
             (start_text, 250),
@@ -160,7 +166,7 @@ class KeyboardTrainer:
             (stats_text, 390),
             (difficulty_text, 460)
         ]
-        
+
         for text, y in texts:
             self.window.blit(text, (self.WIDTH//2 - text.get_width()//2, y))
 
@@ -177,11 +183,15 @@ class KeyboardTrainer:
         ]
 
         for i, (setting_name, value) in enumerate(settings_items):
-            text = self.menu_font.render(f"{setting_name}: {'Вкл' if value else 'Выкл'}", True, self.WHITE)
-            self.window.blit(text, (self.WIDTH//2 - text.get_width()//2, 150 + i * 60))
+            text = self.menu_font.render(
+                f"{setting_name}: {'Вкл' if value else 'Выкл'}", True, self.WHITE)
+            self.window.blit(
+                text, (self.WIDTH//2 - text.get_width()//2, 150 + i * 60))
 
-        back_text = self.small_font.render("ESC - Вернуться в меню", True, self.WHITE)
-        self.window.blit(back_text, (self.WIDTH//2 - back_text.get_width()//2, self.HEIGHT - 50))
+        back_text = self.small_font.render(
+            "ESC - Вернуться в меню", True, self.WHITE)
+        self.window.blit(back_text, (self.WIDTH//2 -
+                         back_text.get_width()//2, self.HEIGHT - 50))
 
     def draw_statistics(self):
         self.window.fill(self.BLACK)
@@ -200,36 +210,43 @@ class KeyboardTrainer:
 
         for i, stat in enumerate(stats_items):
             text = self.small_font.render(stat, True, self.WHITE)
-            self.window.blit(text, (self.WIDTH//2 - text.get_width()//2, 150 + i * 40))
+            self.window.blit(
+                text, (self.WIDTH//2 - text.get_width()//2, 150 + i * 40))
 
-        back_text = self.small_font.render("ESC - Вернуться в меню", True, self.WHITE)
-        self.window.blit(back_text, (self.WIDTH//2 - back_text.get_width()//2, self.HEIGHT - 50))
+        back_text = self.small_font.render(
+            "ESC - Вернуться в меню", True, self.WHITE)
+        self.window.blit(back_text, (self.WIDTH//2 -
+                         back_text.get_width()//2, self.HEIGHT - 50))
 
     def draw_game(self):
         background_color = self.BLACK if self.settings["dark_mode"] else self.WHITE
         text_color = self.WHITE if self.settings["dark_mode"] else self.BLACK
-        
+
         self.window.fill(background_color)
-        
+
         # Отрисовка частиц
         if self.settings["particles_enabled"]:
             for particle in self.particles:
                 alpha = int(255 * particle['life'])
                 color = (*particle['color'][:3], alpha)
-                pygame.draw.circle(self.window, color, 
-                                 (int(particle['x']), int(particle['y'])), 3)
+                pygame.draw.circle(self.window, color,
+                                   (int(particle['x']), int(particle['y'])), 3)
 
         # Отрисовка букв с эффектами
         for letter in self.letters:
             if self.settings["letter_effects"]:
-                letter['rotation'] = math.sin(pygame.time.get_ticks() * 0.003) * 10
-                letter['scale'] = 1.0 + math.sin(pygame.time.get_ticks() * 0.005) * 0.1
+                letter['rotation'] = math.sin(
+                    pygame.time.get_ticks() * 0.003) * 10
+                letter['scale'] = 1.0 + \
+                    math.sin(pygame.time.get_ticks() * 0.005) * 0.1
 
             text = self.main_font.render(letter['char'], True, letter['color'])
             if self.settings["letter_effects"]:
-                text = pygame.transform.rotozoom(text, letter['rotation'], letter['scale'])
-            
-            self.window.blit(text, (letter['x'] - text.get_width()//2, letter['y']))
+                text = pygame.transform.rotozoom(
+                    text, letter['rotation'], letter['scale'])
+
+            self.window.blit(
+                text, (letter['x'] - text.get_width()//2, letter['y']))
 
         # Отрисовка игровой информации
         info_texts = [
@@ -245,20 +262,24 @@ class KeyboardTrainer:
             self.window.blit(surface, (10, 10 + i * 50))
 
     def update_statistics(self):
-        session_duration = int((datetime.now() - self.session_start_time).total_seconds())
+        session_duration = int(
+            (datetime.now() - self.session_start_time).total_seconds())
         self.stats["total_games"] += 1
         self.stats["total_time"] += session_duration
         self.stats["best_scores"][self.current_difficulty] = max(
-            self.stats["best_scores"][self.current_difficulty], 
+            self.stats["best_scores"][self.current_difficulty],
             self.score
         )
-        self.stats["longest_combo"] = max(self.stats["longest_combo"], self.max_combo)
+        self.stats["longest_combo"] = max(
+            self.stats["longest_combo"], self.max_combo)
         self.stats["total_keys_pressed"] += self.total_keys_pressed
         self.stats["correct_keys_pressed"] += self.correct_keys_pressed
         self.stats["average_accuracy"] = round(
-            (self.stats["correct_keys_pressed"] / max(1, self.stats["total_keys_pressed"])) * 100
+            (self.stats["correct_keys_pressed"] /
+             max(1, self.stats["total_keys_pressed"])) * 100
         )
-        self.stats["last_session"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.stats["last_session"] = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S")
         self.save_statistics()
 
     def run(self):
@@ -285,13 +306,18 @@ class KeyboardTrainer:
                             self.game_state = GameState.SETTINGS
                         elif event.key == pygame.K_t:
                             self.game_state = GameState.STATISTICS
+                        elif event.key == pygame.K_F11:  # F11 для переключения полноэкранного режима
+                            pygame.display.toggle_fullscreen()
                         elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
                             difficulties = list(self.difficulty_levels.keys())
-                            current_index = difficulties.index(self.current_difficulty)
+                            current_index = difficulties.index(
+                                self.current_difficulty)
                             if event.key == pygame.K_LEFT:
-                                self.current_difficulty = difficulties[(current_index - 1) % len(difficulties)]
+                                self.current_difficulty = difficulties[(
+                                    current_index - 1) % len(difficulties)]
                             else:
-                                self.current_difficulty = difficulties[(current_index + 1) % len(difficulties)]
+                                self.current_difficulty = difficulties[(
+                                    current_index + 1) % len(difficulties)]
                             self.reset_game()
 
                     elif self.game_state == GameState.SETTINGS:
@@ -308,46 +334,49 @@ class KeyboardTrainer:
                         self.total_keys_pressed += 1
                         key_pressed = event.unicode.upper()
                         matched = False
-                        
+
                         for letter in self.letters[:]:
                             if letter['char'] == key_pressed:
                                 self.letters.remove(letter)
                                 self.score += (1 + self.combo)
                                 self.combo += 1
-                                self.max_combo = max(self.max_combo, self.combo)
+                                self.max_combo = max(
+                                    self.max_combo, self.combo)
                                 self.correct_keys_pressed += 1
                                 matched = True
-                                
+
                                 # Эффекты при правильном нажатии
                                 if self.settings["particles_enabled"]:
-                                    self.create_particle_effect(letter['x'], letter['y'], self.GREEN)
-                                
+                                    self.create_particle_effect(
+                                        letter['x'], letter['y'], self.GREEN)
+
                                 # Звуковой эффект
                                 if self.settings["sound_enabled"] and self.sounds["correct"]:
                                     self.sounds["correct"].play()
-                                
+
                                 # Повышение уровня
                                 if self.score > self.level * 100:
                                     self.level += 1
                                     if self.settings["sound_enabled"] and self.sounds["level_up"]:
                                         self.sounds["level_up"].play()
                                 break
-                        
+
                         if not matched:
                             self.combo = 0
                             if self.settings["sound_enabled"] and self.sounds["wrong"]:
                                 self.sounds["wrong"].play()
                             if self.settings["particles_enabled"]:
                                 self.create_particle_effect(
-                                    self.WIDTH//2, 
-                                    self.HEIGHT//2, 
+                                    self.WIDTH//2,
+                                    self.HEIGHT//2,
                                     self.RED
                                 )
-                        
+
                         self.accuracy = round(
-                            (self.correct_keys_pressed / max(1, self.total_keys_pressed)) * 100
+                            (self.correct_keys_pressed /
+                             max(1, self.total_keys_pressed)) * 100
                         )
-                        
+
                     elif self.game_state == GameState.GAME_OVER:
                         if event.key == pygame.K_r:
                             self.update_statistics()
@@ -376,25 +405,26 @@ class KeyboardTrainer:
                     # Изменение цвета буквы при приближении к низу экрана
                     danger_zone = self.HEIGHT * 0.7
                     if letter['y'] > danger_zone:
-                        danger_factor = (letter['y'] - danger_zone) / (self.HEIGHT - danger_zone)
+                        danger_factor = (
+                            letter['y'] - danger_zone) / (self.HEIGHT - danger_zone)
                         letter['color'] = (
                             int(255 * danger_factor),  # R
                             int(255 * (1 - danger_factor)),  # G
                             0  # B
                         )
-                    
+
                     if letter['y'] > self.HEIGHT:
                         self.letters.remove(letter)
                         self.missed += 1
                         self.combo = 0
-                        
+
                         if self.settings["particles_enabled"]:
                             self.create_particle_effect(
                                 letter['x'],
                                 self.HEIGHT,
                                 self.RED
                             )
-                        
+
                         if self.missed >= 10:
                             self.game_state = GameState.GAME_OVER
                             self.update_statistics()
@@ -424,11 +454,12 @@ class KeyboardTrainer:
 
     def draw_game_over(self):
         self.window.fill(self.BLACK)
-        
+
         texts = [
             ("ИГРА ОКОНЧЕНА!", self.RED, self.main_font),
             (f"Финальный счёт: {self.score}", self.WHITE, self.menu_font),
-            (f"Максимальное комбо: {self.max_combo}", self.BLUE, self.menu_font),
+            (f"Максимальное комбо: {self.max_combo}",
+             self.BLUE, self.menu_font),
             (f"Точность: {self.accuracy}%", self.GREEN, self.menu_font),
             ("R - Начать заново", self.WHITE, self.menu_font),
             ("Q - Выйти", self.WHITE, self.menu_font)
@@ -460,6 +491,7 @@ class KeyboardTrainer:
                 surface,
                 (self.WIDTH//2 - surface.get_width()//2, 200 + i * 70)
             )
+
 
 if __name__ == "__main__":
     game = KeyboardTrainer()
