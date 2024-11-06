@@ -1,0 +1,34 @@
+=== Отчет по анализу Python кода ===
+
+Переменные (по алфавиту):
+- analyzer
+- const
+- file
+- func
+- input_file
+- label
+- n
+- node
+- output_file
+- proc
+- returns_value
+- source
+- tree
+- var
+
+Константы (по алфавиту):
+
+Метки (по алфавиту):
+
+Системные процедуры:
+
+Системные функции:
+
+Пользовательские процедуры:
+- __init__
+- _analyze_ast
+- analyze_file
+- main
+- save_report
+
+Пользовательские функции:
