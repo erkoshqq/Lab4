@@ -298,10 +298,6 @@ class KeyboardTrainer:
                                 self.window = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)
 
                             pygame.display.toggle_fullscreen()
-                            # if self.fullscreen:
-                            #     self.window = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.FULLSCREEN)
-                            # else:
-                            #     self.window = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)
                         elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
                             difficulties = list(self.difficulty_levels.keys())
                             current_index = difficulties.index(self.current_difficulty)
