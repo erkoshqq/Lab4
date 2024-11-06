@@ -1,0 +1,79 @@
+=== Отчет по анализу Python кода ===
+
+Переменные (по алфавиту):
+- _
+- alpha
+- angle
+- available_chars
+- back_text
+- background_color
+- clock
+- color
+- current_index
+- danger_factor
+- danger_zone
+- difficulties
+- difficulty_text
+- event
+- f
+- font
+- game
+- i
+- info_texts
+- key_pressed
+- letter
+- matched
+- overlay
+- particle
+- running
+- session_duration
+- setting_name
+- settings_items
+- settings_text
+- spawn_rate
+- speed
+- start_text
+- stat
+- stats_items
+- stats_text
+- surface
+- text
+- text_color
+- texts
+- title
+- value
+- x
+- y
+
+Константы (по алфавиту):
+- GAME_OVER
+- MENU
+- PAUSED
+- PLAYING
+- SETTINGS
+- STATISTICS
+
+Метки (по алфавиту):
+
+Системные процедуры:
+
+Системные функции:
+
+Пользовательские процедуры:
+- __init__
+- create_particle_effect
+- draw_game
+- draw_game_over
+- draw_menu
+- draw_pause_screen
+- draw_settings
+- draw_statistics
+- reset_game
+- run
+- save_statistics
+- spawn_letter
+- update_particles
+- update_statistics
+
+Пользовательские функции:
+- load_statistics
